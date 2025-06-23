@@ -4,6 +4,7 @@ import plotly.express as px
 
 # Load data
 df = pd.read_csv("https://drive.google.com/uc?export=download&id=1Eeb1JyvhLvhdoFXFdj4jdKx4CIYM4lhG")
+
 st.set_page_config(page_title="Student Quiz Dashboard", layout="wide")
 st.title("🎓 Umagine Student Impact Dashboard")
 
