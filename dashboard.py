@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 
 # Load data
-df = pd.read_csv("df_cleaned_3.csv")
+df = pd.read_csv("https://drive.google.com/drive/folders/1G6HT1Cfrl7Ejx8MyKNZkflMjf2YYoiiD?usp=drive_link")
 st.set_page_config(page_title="Student Quiz Dashboard", layout="wide")
 st.title("🎓 Umagine Student Impact Dashboard")
 
