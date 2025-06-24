@@ -4,19 +4,20 @@ import plotly.express as px
 import requests
 import io
 
-# ✅ Load data from Dropbox
-url = "https://www.dropbox.com/scl/fi/ay8q5axg0lk60bkficjp8/df_cleaned_3.csv?rlkey=l0bd16aytkytv2m6za4tiojov&st=nmvq5k2h&raw=1"
+# ---- LOAD CSV FROM GOOGLE DRIVE ----
+file_id = "1UYSiHKKxqwq2s5Tjtypnce3-tz6xqDlV"
+url = f"https://drive.google.com/uc?export=download&id={file_id}"
 
 try:
     response = requests.get(url)
     df = pd.read_csv(io.StringIO(response.content.decode('utf-8')), on_bad_lines='skip')
     df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
-    st.success("✅ File loaded from Dropbox!")
+    st.success("✅ File loaded successfully from Google Drive!")
 except Exception as e:
     st.error(f"❌ Failed to load file: {e}")
     st.stop()
 
-# ✅ Begin dashboard
+# ---- PAGE CONFIG ----
 st.set_page_config(page_title="Student Quiz Dashboard", layout="wide")
 st.title("🎓 Umagine Student Impact Dashboard")
 
@@ -44,8 +45,7 @@ st.subheader("E. Question with the lowest score")
 lowest_q = score_by_question.loc[score_by_question['total_score'].idxmin()]['question_no']
 st.error(f"Lowest scoring question: {int(lowest_q)}")
 
-# Histogram (Note: Fix score column name here if needed)
-fig1 = px.histogram(df, x="total_score", nbins=20, title="Total Score Distribution", labels={'total_score': 'Score'})
+fig1 = px.histogram(df, x="total_score", nbins=20, title="Total Score Distribution")
 st.plotly_chart(fig1)
 
 # ---------- INSIGHT 2 ----------
@@ -131,13 +131,12 @@ st.metric("Repeated Same Wrong Answers", repeat_wrongs.shape[0])
 st.header("📌 Insight 5: SCORING TRENDS")
 
 st.subheader("A. Score distribution histogram")
-total_score_bins = pd.cut(df['total_score'], bins=[0, 2, 5, 8, 10], labels=["0-2", "3-5", "6-8", "9-10"])
-total_score_dist = total_score_bins.value_counts().reset_index()
-total_score_dist.columns = ['Range', 'Count']
-fig10 = px.pie(total_score_dist, names='Range', values='Count')
+score_bins = pd.cut(df['total_score'], bins=[0, 2, 5, 8, 10], labels=["0-2", "3-5", "6-8", "9-10"])
+score_dist = score_bins.value_counts().reset_index()
+score_dist.columns = ['Range', 'Count']
+fig10 = px.pie(score_dist, names='Range', values='Count')
 st.plotly_chart(fig10)
 
 st.subheader("B. Score range per question")
-total_score_range = df.groupby('question_no')['total_score'].agg(['min', 'max']).reset_index()
-st.dataframe(total_score_range)
-
+score_range = df.groupby('question_no')['total_score'].agg(['min', 'max']).reset_index()
+st.dataframe(score_range)
