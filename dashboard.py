@@ -2,8 +2,23 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# Load CSV from Google Drive
-csv_url = "https://drive.google.com/uc?export=download&id=1Eeb1JyvhLvhdoFXFdj4jdKx4CIYM4lhG"
+import streamlit as st
+import pandas as pd
+import plotly.express as px
+import requests
+import io
+
+# Dropbox raw file link
+url = "https://www.dropbox.com/scl/fi/ay8q5axg0lk60bkficjp8/df_cleaned_3.csv?rlkey=l0bd16aytkytv2m6za4tiojov&st=nmvq5k2h&raw=1"
+
+try:
+    response = requests.get(url)
+    df = pd.read_csv(io.StringIO(response.content.decode('utf-8')), on_bad_lines='skip')
+    df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
+    st.success("✅ File loaded from Dropbox!")
+except Exception as e:
+    st.error(f"❌ Failed to load file: {e}")
+    st.stop()
 
 try:
     df = pd.read_csv(csv_url, on_bad_lines='skip')
@@ -13,13 +28,6 @@ try:
 except Exception as e:
     st.error(f"❌ Failed to load CSV: {e}")
     st.stop()
-
-import streamlit as st
-import pandas as pd
-import plotly.express as px
-
-# Load data
-df = pd.read_csv("https://drive.google.com/uc?export=download&id=1Eeb1JyvhLvhdoFXFdj4jdKx4CIYM4lhG")
 
 st.set_page_config(page_title="Student Quiz Dashboard", layout="wide")
 st.title("🎓 Umagine Student Impact Dashboard")
