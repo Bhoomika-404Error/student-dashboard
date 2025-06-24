@@ -2,6 +2,22 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
+# Load CSV from Google Drive
+csv_url = "https://drive.google.com/uc?export=download&id=1Eeb1JyvhLvhdoFXFdj4jdKx4CIYM4lhG"
+
+try:
+    df = pd.read_csv(csv_url, on_bad_lines='skip')
+    df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
+    st.success("✅ CSV loaded successfully!")
+    st.write("📊 Columns in CSV:", df.columns.tolist())  # 🔍 Show actual column names
+except Exception as e:
+    st.error(f"❌ Failed to load CSV: {e}")
+    st.stop()
+
+import streamlit as st
+import pandas as pd
+import plotly.express as px
+
 # Load data
 df = pd.read_csv("https://drive.google.com/uc?export=download&id=1Eeb1JyvhLvhdoFXFdj4jdKx4CIYM4lhG")
 
@@ -12,7 +28,7 @@ st.title("🎓 Umagine Student Impact Dashboard")
 st.header("📌 Insight 1: OVERALL QUIZ PERFORMANCE")
 
 st.subheader("A. Average score per quiz")
-avg_score = df['score'].mean()
+avg_score = df['total_score'].mean()
 st.metric("Average Score", f"{avg_score:.2f}")
 
 st.subheader("B. Overall accuracy rate")
@@ -24,12 +40,12 @@ all_correct = df.groupby('User_id')['is_correct'].sum() == df.groupby('User_id')
 st.metric("Users Got All Correct", all_correct.sum())
 
 st.subheader("D. Question with the highest score")
-score_by_question = df.groupby('question_no')['score'].mean().reset_index()
-highest_q = score_by_question.loc[score_by_question['score'].idxmax()]['question_no']
+score_by_question = df.groupby('question_no')['total_score'].mean().reset_index()
+highest_q = total_score_by_question.loc[total_score_by_question['total_score'].idxmax()]['question_no']
 st.success(f"Highest scoring question: {int(highest_q)}")
 
 st.subheader("E. Question with the lowest score")
-lowest_q = score_by_question.loc[score_by_question['score'].idxmin()]['question_no']
+lowest_q = total_score_by_question.loc[total_score_by_question['total_score'].idxmin()]['question_no']
 st.error(f"Lowest scoring question: {int(lowest_q)}")
 
 fig1 = px.histogram(df, x="score", nbins=20, title="Total Score Distribution", labels={'score':'Score'})
@@ -118,13 +134,13 @@ st.metric("Repeated Same Wrong Answers", repeat_wrongs.shape[0])
 st.header("📌 Insight 5: SCORING TRENDS")
 
 st.subheader("A. Score distribution histogram")
-score_bins = pd.cut(df['score'], bins=[0,2,5,8,10], labels=["0-2", "3-5", "6-8", "9-10"])
-score_dist = score_bins.value_counts().reset_index()
-score_dist.columns = ['Range', 'Count']
-fig10 = px.pie(score_dist, names='Range', values='Count', title="Score Ranges")
+total_score_bins = pd.cut(df['total_score'], bins=[0,2,5,8,10], labels=["0-2", "3-5", "6-8", "9-10"])
+total_score_dist = total_score_bins.value_counts().reset_index()
+total_score_dist.columns = ['Range', 'Count']
+fig10 = px.pie(total_score_dist, names='Range', values='Count', title="Score Ranges")
 st.plotly_chart(fig10)
 
 st.subheader("B. Score range per question")
-score_range = df.groupby('question_no')['score'].agg(['min','max']).reset_index()
-st.dataframe(score_range)
+total_score_range = df.groupby('question_no')['total_score'].agg(['min','max']).reset_index()
+st.dataframe(total_score_range)
 
